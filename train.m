@@ -8,7 +8,7 @@ img_per_class = 60;
 img_num = class_num .* img_per_class;
 
 %this was changed to imageDatastore
-feat_dim = imageDatastore(feature_extraction(imread('./val/Balloon/329060.JPG')),2);
+feat_dim = size(feature_extraction(imread(img)),2);
 
 folder_dir = dir(img_path);
 feat_train = zeros(img_num,feat_dim);
