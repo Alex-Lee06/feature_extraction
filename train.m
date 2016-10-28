@@ -6,14 +6,12 @@ img_path = './train/';
 class_num = 30;
 img_per_class = 60;
 img_num = class_num .* img_per_class;
-
-%this was changed to imageDatastore
-feat_dim = size(feature_extraction(imread(img)),2);
+feat_dim = size(feature_extraction(imread('./val/Balloon/329060.JPG')),2);
 
 folder_dir = dir(img_path);
 feat_train = zeros(img_num,feat_dim);
 label_train = zeros(img_num,1);
-
+all_features = [];
 for i = 1:length(folder_dir)-2
     
     img_dir = dir([img_path,folder_dir(i+2).name,'/*.JPG']);
@@ -23,11 +21,14 @@ for i = 1:length(folder_dir)-2
     
     label_train((i-1)*img_per_class+1:i*img_per_class) = i;
     
-    for j = 1:length(img_dir)        
+   for j = 1:length(img_dir):5        
         img = imread([img_path,folder_dir(i+2).name,'/',img_dir(j).name]);
-        feat_train((i-1)*img_per_class+j,:) = feature_extraction(img);
+        img = rgb2gray(img);
+        points = detectSURFFeatures(img);
+        [features, valid_points] = extractFeatures(img, points);
+        all_features = [all_features; features];
     end
     
 end
-
-save('model.mat','feat_train','label_train');
+[idx, centroid] = kmeans(all_features, 128, 'MaxIter', 10000, 'Replicates', 5);
+save('model.mat','feat_train','label_train','centroid');
